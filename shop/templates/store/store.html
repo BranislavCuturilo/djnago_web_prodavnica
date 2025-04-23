@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Prodavnica - ПАЛАС{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Collection Banner -->
+    {% if collection %}
+    <div class="collection-banner mb-4">
+        <h1>{{ collection.name }}</h1>
+        <p>{{ collection.description }}</p>
+        <p class="text-muted">
+            {% if collection.start_date %}
+            Od: {{ collection.start_date|date:"d.m.Y." }}
+            {% endif %}
+            {% if collection.end_date %}
+            Do: {{ collection.end_date|date:"d.m.Y." }}
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Category Banner -->
+    {% if category %}
+    <div class="category-banner mb-4">
+        <h1>{{ category.name }}</h1>
+        <p>{{ category.description }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Special Section Banners -->
+    {% if bundle %}
+    <div class="special-banner mb-4">
+        <h1>Bundle ponude</h1>
+        <p>Posebne ponude za kupovinu više proizvoda</p>
+    </div>
+    {% endif %}
+
+    {% if promotion %}
+    <div class="special-banner mb-4">
+        <h1>Promocije</h1>
+        <p>Posebne akcije i sniženja</p>
+    </div>
+    {% endif %}
+
+    {% if discount %}
+    <div class="special-banner mb-4">
+        <h1>Outlet</h1>
+        <p>Proizvodi sa velikim sniženjima</p>
+    </div>
+    {% endif %}
+
+    <!-- Search Results -->
+    {% if search_query %}
+    <div class="search-results mb-4">
+        <h2>Rezultati pretrage za: "{{ search_query }}"</h2>
+        <p class="text-muted">Pronađeno {{ products|length }} proizvoda</p>
+    </div>
+    {% endif %}
+
+    <!-- Products Grid -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100 product-card">
+                <!-- Product Image -->
+                <div class="product-image-container">
+                    {% if product.main_image %}
+                    <img src="{{ product.main_image.url }}" class="card-img-top product-image" alt="{{ product.name }}">
+                    {% if product.hover_image %}
+                    <img src="{{ product.hover_image.url }}" class="card-img-top product-hover-image" alt="{{ product.name }}">
+                    {% endif %}
+                    {% endif %}
+                    <!-- Wishlist Button -->
+                    {% if user.is_authenticated %}
+                    <button class="wishlist-btn" data-product-id="{{ product.id }}">
+                        <span class="material-icons">favorite_border</span>
+                    </button>
+                    {% endif %}
+                    <!-- Discount Badge -->
+                    {% if product.discount %}
+                    <div class="discount-badge">
+                        -{{ product.discount }}%
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-body">
+                    <!-- Product Name -->
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    
+                    <!-- Product Description -->
+                    <p class="card-text">{{ product.short_description|truncatewords:20 }}</p>
+                    
+                    <!-- Price -->
+                    <div class="price">
+                        {% if product.discount %}
+                        <span class="original-price">{{ product.price }} RSD</span>
+                        <span class="discount-price">{{ product.discounted_price }} RSD</span>
+                        {% else %}
+                        <span class="regular-price">{{ product.price }} RSD</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Add to Cart Button -->
+                    <button class="btn add-to-cart" data-product-id="{{ product.id }}">
+                        Dodaj u korpu
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                Nema proizvoda koji odgovaraju vašim kriterijumima.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #606C38;
+        --secondary-color: #BC6C25;
+        --accent-color: #3A7D7D;
+        --background-color: #F8F4EC;
+        --text-color: #2C3E50;
+        --text-light: #7F8C8D;
+        --white: #FFFFFF;
+        --black: #000000;
+    }
+
+    body {
+        background-color: var(--background-color);
+        color: var(--text-color);
+    }
+
+    .product-card {
+        position: relative;
+        background: var(--white);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .product-image-container {
+        position: relative;
+        padding-top: 100%;
+        overflow: hidden;
+    }
+    
+    .product-image,
+    .product-hover-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: opacity 0.3s ease;
+    }
+    
+    .product-hover-image {
+        opacity: 0;
+    }
+    
+    .product-image-container:hover .product-hover-image {
+        opacity: 1;
+    }
+    
+    .wishlist-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: var(--white);
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        z-index: 2;
+    }
+    
+    .wishlist-btn:hover {
+        background: var(--primary-color);
+        color: var(--white);
+    }
+    
+    .discount-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: var(--secondary-color);
+        color: var(--white);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        z-index: 2;
+    }
+    
+    .card-body {
+        padding: 15px;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+        margin-bottom: 8px;
+        color: var(--text-color);
+    }
+    
+    .price {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin: 10px 0;
+    }
+    
+    .original-price {
+        text-decoration: line-through;
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+    
+    .discount-price {
+        color: var(--secondary-color);
+        font-weight: bold;
+    }
+    
+    .regular-price {
+        color: var(--text-color);
+        font-weight: bold;
+    }
+
+    .add-to-cart {
+        width: 100%;
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+        padding: 8px;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+
+    .add-to-cart:hover {
+        background-color: var(--accent-color);
+    }
+
+    .collection-banner,
+    .category-banner,
+    .special-banner,
+    .search-results {
+        background-color: var(--white);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .collection-banner h1,
+    .category-banner h1,
+    .special-banner h1,
+    .search-results h2 {
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+</style>
+
+{% block extra_js %}
+<script>
+    // Wishlist functionality
+    document.querySelectorAll('.wishlist-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            fetch(`/wishlist/toggle/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'added') {
+                    this.innerHTML = '<span class="material-icons">favorite</span>';
+                } else {
+                    this.innerHTML = '<span class="material-icons">favorite_border</span>';
+                }
+            });
+        });
+    });
+
+    // Cart functionality
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            fetch(`/cart/add/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Update cart count in navbar
+                    const cartCount = document.querySelector('.cart-count');
+                    if (cartCount) {
+                        cartCount.textContent = data.cart_count;
+                    }
+                    // Show success message
+                    alert('Proizvod je dodat u korpu');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}
+
+
+

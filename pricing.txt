@@ -1,0 +1,31 @@
+cena= cena izrade + afiliate + cena dostave + cena dostavljaca (preuzimanje robe , skladistenje ) + profit sajta + profit brennda
+
+cena izrade =
+afiliate (izracunava se nakon cene izrade , cene dostave , profita brenada , profita sajta / oduzima se od profita brenda)= proizvodi : 0-1 $  = 5c , 1-5 $ = 30c , 5-10 $ = 1$ , 10-20$ = 2$ 20-50$ = 3.5$ , 50-150 $ = 5$ , 150-250$ = 7.5 $ , 250-500$ = 15$.
+cena dostave =
+cena dostavljaca (placa brend da covek licno raznese , placa brend + sajt da covek preuzme i odnese u postu) = jednom nedeljno placa se covek koji pokupi sve porudzbine i odnese u postu/na adresu .
+profit sajta (izracunava se nakon cene izrade , cene dostave , profita brenada )= 0 ako brend placa da prodaje preko naseg servisa , 0-7$ = 2$ , 7-25 $ = 5 $ , 25-50$ = 7$ , 50-100$ = 8.5$ , 100-250$ = 12.5$ , 250-500$ = 15$.
+profit brenda =
+
+
+
+
+
+
+proces afiliate lokalno trziste
+kupci vide reklamu > kupci pristupe sajtu sa afiliate linkom > kupci poruce > sajt posalje porudzbenicu svim brendovima > brendovi odobre porudzbenicu > brendovi uplate pare za izradu glisi > glisa vrati podatke o porudzbenici > sajt potvrdi porudzbinu kupucu > nakon sedam dana i svih porudzbina glisa placa izradu i stampu > glisa salje potvrdu o placanju > glisa preuzima robu > glisa salje robu > kupci placaju robu pouzecu > glisa preuzima uplate > glisa zadrzava novac za slanje i deo profita za posredovanje > glisa uplacuje pare svim brendovima / uplacuje % za afiliate preko cije reklame je porucen proizvod / uplacuje proviziju (profit sajtu)
+
+proces bez afiliate lokalno trziste
+kupci pristupe sajtu > kupci poruce > sajt posalje porudzbenicu svim brendovima > brendovi odobre porudzbenicu > brendovi uplate pare za izradu glisi > glisa vrati podatke o porudzbenici > sajt potvrdi porudzbinu kupucu > nakon sedam dana i svih porudzbina glisa placa izradu i stampu > glisa salje potvrdu o placanju > glisa preuzima robu > glisa salje robu > kupci placaju robu pouzecu > glisa preuzima uplate > glisa zadrzava novac za slanje i deo profita za posredovanje > glisa uplacuje pare svim brendovima / uplacuje polovinu % za afiliate sajtu a zadrzava drugu polovinu / uplacuje proviziju (profit sajtu)
+
+proces afiliate online placanje 
+kupci vide reklamu > kupci pristupe sajtu sa afiliate linkom > kupci poruce >kupci uplate novac > sajt potvrdi porudzbinu kupucu > sajt posalje porudzbenicu svim brendovima i glisi > sajt uplati pare za izradu glisi > glisa vrati podatke o porudzbini > nakon sedam dana i svih porudzbina glisa placa izradu i stampu > glisa salje potvrdu o placanju > glisa preuzima robu >sajt uplacuje novac glisi za slanje robe> glisa salje robu > kupci preuzimaju robu > sajt isplacuje novac profita svim brendovima / glisin procenat / afiliate procenat 
+
+proces online placanje 
+kupci pristupe sajtu  > kupci poruce >kupci uplate novac > sajt potvrdi porudzbinu kupucu > sajt posalje porudzbenicu svim brendovima i glisi > sajt uplati pare za izradu glisi > glisa vrati podatke o porudzbini > nakon sedam dana i svih porudzbina glisa placa izradu i stampu > glisa salje potvrdu o placanju > glisa preuzima robu >sajt uplacuje novac glisi za slanje robe> glisa salje robu > kupci preuzimaju robu > sajt isplacuje novac profita svim brendovima / glisin procenat  
+
+
+komad
+
+3750=1250 izrada + 250 dostava + 300 skladistenje + 720 40% profita brenda + 410 afiliate + 810 profit sajta 
+

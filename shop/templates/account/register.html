@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - Palas{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Registracija</h3>
+                    <form method="post" action="{% url 'store:register' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_first_name" class="form-label">Ime</label>
+                            <input type="text" class="form-control" id="id_first_name" name="first_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_last_name" class="form-label">Prezime</label>
+                            <input type="text" class="form-control" id="id_last_name" name="last_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label">Email adresa</label>
+                            <input type="email" class="form-control" id="id_email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_password1" class="form-label">Lozinka</label>
+                            <input type="password" class="form-control" id="id_password1" name="password1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_password2" class="form-label">Potvrdi lozinku</label>
+                            <input type="password" class="form-control" id="id_password2" name="password2" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Registruj se</button>
+                    </form>
+                    <hr>
+                    <div class="text-center">
+                        <p class="mb-0">Već imate nalog? <a href="{% url 'store:login' %}" class="text-decoration-none">Prijavite se</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

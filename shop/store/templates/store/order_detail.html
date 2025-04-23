@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order #{{ order.id }} - Palas{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <img src="{% static 'images/default-avatar.png' %}" alt="Profile" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    <h5 class="card-title">{{ user.get_full_name|default:user.username }}</h5>
+                    <p class="text-muted">{{ user.email }}</p>
+                </div>
+            </div>
+            <div class="list-group">
+                <a href="{% url 'store:profile' %}" class="list-group-item list-group-item-action">
+                    <i class="material-icons">person</i> Profile
+                </a>
+                <a href="{% url 'store:orders' %}" class="list-group-item list-group-item-action active">
+                    <i class="material-icons">shopping_bag</i> Orders
+                </a>
+                <a href="{% url 'store:wishlist' %}" class="list-group-item list-group-item-action">
+                    <i class="material-icons">favorite</i> Wishlist
+                </a>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Order #{{ order.id }}</h4>
+                    <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% elif order.status == 'cancelled' %}bg-danger{% else %}bg-info{% endif %}">
+                        {{ order.get_status_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Shipping Information</h5>
+                            <p>
+                                {{ order.shipping_address.first_name }} {{ order.shipping_address.last_name }}<br>
+                                {{ order.shipping_address.address }}<br>
+                                {{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.zip_code }}<br>
+                                {{ order.shipping_address.country }}<br>
+                                Phone: {{ order.shipping_address.phone }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Order Information</h5>
+                            <p>
+                                Order Date: {{ order.created_at|date:"d M Y" }}<br>
+                                Payment Method: {{ order.payment_method }}<br>
+                                {% if order.tracking_number %}
+                                    Tracking Number: {{ order.tracking_number }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" class="me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                <div>
+                                                    <h6 class="mb-0">{{ item.product.name }}</h6>
+                                                    <small class="text-muted">{{ item.product.description|truncatechars:50 }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>${{ item.price }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>${{ item.total_price }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                    <td>${{ order.subtotal }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Shipping:</strong></td>
+                                    <td>${{ order.shipping_cost }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                    <td>${{ order.total_price }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    {% if order.status == 'pending' %}
+                        <div class="text-end mt-4">
+                            <a href="{% url 'store:cancel_order' order.id %}" class="btn btn-danger">
+                                <i class="material-icons">cancel</i> Cancel Order
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order #{{ order.id }} - Palas{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Detalji porudžbine #{{ order.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Informacije o porudžbini</h5>
+                            <p><strong>Datum:</strong> {{ order.created_at|date:"d.m.Y. H:i" }}</p>
+                            <p><strong>Status:</strong> 
+                                <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'processing' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </p>
+                            <p><strong>Ukupno:</strong> ${{ order.total_price }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Adresa za dostavu</h5>
+                            <p>{{ order.shipping_address.street }} {{ order.shipping_address.number }}</p>
+                            <p>{{ order.shipping_address.city }}, {{ order.shipping_address.postal_code }}</p>
+                            <p>{{ order.shipping_address.country }}</p>
+                        </div>
+                    </div>
+
+                    <h5>Proizvodi</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Proizvod</th>
+                                    <th>Cena</th>
+                                    <th>Količina</th>
+                                    <th>Ukupno</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                            <div class="ms-3">
+                                                <h6 class="mb-0">{{ item.product.name }}</h6>
+                                                <small class="text-muted">{{ item.product.description|truncatechars:50 }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>${{ item.price }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ item.total_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Status porudžbine</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item {% if order.status == 'completed' %}completed{% elif order.status == 'processing' %}active{% endif %}">
+                            <div class="timeline-point"></div>
+                            <div class="timeline-content">
+                                <h6>Porudžbina primljena</h6>
+                                <small>{{ order.created_at|date:"d.m.Y. H:i" }}</small>
+                            </div>
+                        </div>
+                        <div class="timeline-item {% if order.status == 'completed' %}completed{% elif order.status == 'processing' %}active{% endif %}">
+                            <div class="timeline-point"></div>
+                            <div class="timeline-content">
+                                <h6>U obradi</h6>
+                                <small>{{ order.updated_at|date:"d.m.Y. H:i" }}</small>
+                            </div>
+                        </div>
+                        <div class="timeline-item {% if order.status == 'completed' %}completed{% endif %}">
+                            <div class="timeline-point"></div>
+                            <div class="timeline-content">
+                                <h6>Završeno</h6>
+                                {% if order.status == 'completed' %}
+                                <small>{{ order.completed_at|date:"d.m.Y. H:i" }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-point {
+    position: absolute;
+    left: -20px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #dee2e6;
+}
+
+.timeline-item.active .timeline-point {
+    background-color: #0d6efd;
+}
+
+.timeline-item.completed .timeline-point {
+    background-color: #198754;
+}
+
+.timeline-content {
+    padding-left: 10px;
+}
+</style>
+{% endblock %} 

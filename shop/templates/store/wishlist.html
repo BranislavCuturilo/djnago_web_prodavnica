@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista želja - Palas{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Lista želja</h1>
+    
+    {% if wishlist_items %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {% for item in wishlist_items %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="position-relative">
+                    <img src="{{ item.product.main_image.url }}" class="card-img-top" alt="{{ item.product.name }}">
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeFromWishlist({{ item.id }})">
+                            <i class="material-icons">favorite</i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.product.name }}</h5>
+                    <p class="card-text text-muted small">{{ item.product.description|truncatechars:100 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% if item.product.discount %}
+                        <div>
+                            <span class="text-decoration-line-through text-muted">${{ item.product.price }}</span>
+                            <span class="text-danger">${{ item.product.discounted_price }}</span>
+                        </div>
+                        {% else %}
+                        <span>${{ item.product.price }}</span>
+                        {% endif %}
+                        <button class="btn btn-sm btn-primary" onclick="addToCart({{ item.product.id }})">
+                            <i class="material-icons">shopping_cart</i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'store:product_detail' item.product.id %}" class="btn btn-outline-primary w-100">Detalji</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <h3>Vaša lista želja je prazna</h3>
+        <p class="text-muted">Dodajte proizvode u listu želja da biste ih kasnije kupili.</p>
+        <a href="{% url 'store:store' %}" class="btn btn-primary">Nastavi kupovinu</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function removeFromWishlist(itemId) {
+    if (confirm('Da li ste sigurni da želite da uklonite ovaj proizvod iz liste želja?')) {
+        fetch(`/wishlist/remove/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+
+function addToCart(productId) {
+    fetch('/cart/add/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ product_id: productId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Proizvod je dodat u korpu!');
+        }
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
+
+

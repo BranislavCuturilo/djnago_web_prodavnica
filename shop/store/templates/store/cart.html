@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cart - Palas{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Your Cart</h1>
+    
+    {% if items %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                                            <div class="ms-3">
+                                                <h6 class="mb-0">{{ item.product.name }}</h6>
+                                                <small class="text-muted">{{ item.product.description|truncatechars:50 }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>${{ item.price }}</td>
+                                    <td>
+                                        <div class="input-group" style="width: 120px;">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity({{ item.product.id }}, {{ item.quantity|add:'-1' }})">-</button>
+                                            <input type="number" class="form-control text-center" value="{{ item.quantity }}" min="1" id="quantity-{{ item.product.id }}">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity({{ item.product.id }}, {{ item.quantity|add:'1' }})">+</button>
+                                        </div>
+                                    </td>
+                                    <td>${{ item.total_price }}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm" onclick="removeItem({{ item.product.id }})">
+                                            <i class="material-icons">delete</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Order Summary</h5>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Subtotal</span>
+                            <span>${{ subtotal }}</span>
+                        </div>
+                        
+                        {% if bundle_discounts %}
+                        <div class="mt-3">
+                            <h6>Bundle Discounts</h6>
+                            {% for discount in bundle_discounts %}
+                            <div class="d-flex justify-content-between text-success">
+                                <small>{{ discount.name }}</small>
+                                <small>-${{ discount.discount }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if promotion_discounts %}
+                        <div class="mt-3">
+                            <h6>Promotion Discounts</h6>
+                            {% for discount in promotion_discounts %}
+                            <div class="d-flex justify-content-between text-success">
+                                <small>{{ discount.name }}</small>
+                                <small>-${{ discount.discount }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <strong>Total</strong>
+                            <strong>${{ total }}</strong>
+                        </div>
+                    </div>
+                    <a href="{% url 'checkout' %}" class="btn btn-primary w-100">Proceed to Checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="material-icons display-1 text-muted">shopping_cart</i>
+        <h3 class="mt-3">Your cart is empty</h3>
+        <p class="text-muted">Looks like you haven't added any items to your cart yet.</p>
+        <a href="{% url 'store' %}" class="btn btn-primary">Continue Shopping</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateQuantity(productId, newQuantity) {
+    if (newQuantity < 1) return;
+    
+    fetch('/cart/update/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: newQuantity
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function removeItem(productId) {
+    fetch('/cart/update/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: 0
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Product Images -->
+        <div class="col-md-6">
+            <div class="product-gallery">
+                <!-- Main Image -->
+                <div class="main-image mb-3">
+                    <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="img-fluid rounded">
+                </div>
+                
+                <!-- Gallery Images -->
+                <div class="gallery-thumbnails row g-2">
+                    {% for image in product.gallery_images.all %}
+                    <div class="col-3">
+                        <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" 
+                             class="img-fluid rounded cursor-pointer" onclick="changeMainImage(this.src)">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-md-6">
+            <h1 class="product-title mb-3">{{ product.name }}</h1>
+            
+            <!-- Price -->
+            <div class="product-price mb-3">
+                {% if product.discount %}
+                <span class="text-muted text-decoration-line-through me-2">{{ product.price }} RSD</span>
+                <span class="text-danger h4">{{ product.discounted_price }} RSD</span>
+                <span class="badge bg-danger ms-2">-{{ product.discount }}%</span>
+                {% else %}
+                <span class="h4">{{ product.price }} RSD</span>
+                {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="product-description mb-4">
+                <h5>Opis proizvoda</h5>
+                <p>{{ product.description|linebreaks }}</p>
+            </div>
+
+            <!-- Product Details -->
+            <div class="product-details mb-4">
+                <h5>Detalji proizvoda</h5>
+                <ul class="list-unstyled">
+                    {% if product.brand %}
+                    <li><strong>Brend:</strong> {{ product.brand.name }}</li>
+                    {% endif %}
+                    {% if product.category %}
+                    <li><strong>Kategorija:</strong> {{ product.category.name }}</li>
+                    {% endif %}
+                    {% if product.material %}
+                    <li><strong>Materijal:</strong> {{ product.material }}</li>
+                    {% endif %}
+                    {% if product.color %}
+                    <li><strong>Boja:</strong> {{ product.color }}</li>
+                    {% endif %}
+                    {% if product.size %}
+                    <li><strong>Veličina:</strong> {{ product.size }}</li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <!-- Add to Cart -->
+            <div class="product-actions mb-4">
+                <form action="{% url 'store:add_to_cart' product.id %}" method="post" class="d-flex align-items-center">
+                    {% csrf_token %}
+                    <div class="quantity-selector me-3">
+                        <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" 
+                               class="form-control" style="width: 80px;">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="material-icons">shopping_cart</span>
+                        Dodaj u korpu
+                    </button>
+                </form>
+            </div>
+
+            <!-- Wishlist -->
+            {% if user.is_authenticated %}
+            <div class="wishlist-action">
+                <form action="{% url 'store:add_to_wishlist' product.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger">
+                        <span class="material-icons">favorite_border</span>
+                        Dodaj u listu želja
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="related-products mt-5">
+        <h3 class="mb-4">Slični proizvodi</h3>
+        <div class="row">
+            {% for related in related_products %}
+            <div class="col-md-3 col-6 mb-4">
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <a href="{% url 'store:product_detail' related.id %}">
+                            <img src="{{ related.main_image.url }}" alt="{{ related.name }}" class="product-image">
+                            {% if related.hover_image %}
+                            <img src="{{ related.hover_image.url }}" alt="{{ related.name }}" class="product-hover-image">
+                            {% endif %}
+                        </a>
+                        {% if related.discount %}
+                        <div class="discount-badge">
+                            -{{ related.discount }}%
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">{{ related.name }}</h3>
+                        <div class="product-price">
+                            {% if related.discount %}
+                            <span class="original-price">{{ related.price }} RSD</span>
+                            <span class="discounted-price">{{ related.discounted_price }} RSD</span>
+                            {% else %}
+                            <span class="current-price">{{ related.price }} RSD</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .product-gallery {
+        position: relative;
+    }
+    
+    .main-image {
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        overflow: hidden;
+    }
+    
+    .gallery-thumbnails img {
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+    
+    .gallery-thumbnails img:hover {
+        border-color: var(--primary-color);
+        cursor: pointer;
+    }
+    
+    .product-title {
+        font-size: 2rem;
+        color: var(--text-color);
+    }
+    
+    .product-price {
+        font-size: 1.5rem;
+    }
+    
+    .product-description {
+        color: var(--text-color);
+    }
+    
+    .product-details li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
+<script>
+function changeMainImage(src) {
+    document.querySelector('.main-image img').src = src;
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Korpa - Palas{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Vaša korpa</h1>
+    
+    {% if cart_items %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Proizvod</th>
+                    <th>Cena</th>
+                    <th>Količina</th>
+                    <th>Ukupno</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" class="img-thumbnail" style="width: 80px;">
+                            <div class="ms-3">
+                                <h5 class="mb-0">{{ item.product.name }}</h5>
+                                <small class="text-muted">{{ item.product.description|truncatechars:50 }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if item.product.discount %}
+                        <span class="text-decoration-line-through text-muted">${{ item.product.price }}</span>
+                        <span class="text-danger">${{ item.product.discounted_price }}</span>
+                        {% else %}
+                        ${{ item.product.price }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-sm btn-outline-primary" onclick="updateQuantity({{ item.id }}, 'decrease')">-</button>
+                            <span class="mx-2">{{ item.quantity }}</span>
+                            <button class="btn btn-sm btn-outline-primary" onclick="updateQuantity({{ item.id }}, 'increase')">+</button>
+                        </div>
+                    </td>
+                    <td>${{ item.total_price }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart({{ item.id }})">
+                            <i class="material-icons">delete</i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Ukupno</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Međuzbir:</span>
+                        <span>${{ subtotal }}</span>
+                    </div>
+                    {% if discount %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Popust:</span>
+                        <span class="text-danger">-${{ discount }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Dostava:</span>
+                        <span>${{ shipping }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <strong>Ukupno:</strong>
+                        <strong>${{ total }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{% url 'store:store' %}" class="btn btn-outline-primary me-2">Nastavi kupovinu</a>
+            <a href="{% url 'store:checkout' %}" class="btn btn-primary">Završi kupovinu</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <h3>Vaša korpa je prazna</h3>
+        <p class="text-muted">Dodajte proizvode u korpu da biste nastavili sa kupovinom.</p>
+        <a href="{% url 'store:store' %}" class="btn btn-primary">Nastavi kupovinu</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateQuantity(itemId, action) {
+    fetch(`/cart/update/${itemId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action: action })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function removeFromCart(itemId) {
+    if (confirm('Da li ste sigurni da želite da uklonite ovaj proizvod iz korpe?')) {
+        fetch(`/cart/remove/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
+
+

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Orders - Palas{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="material-icons display-4">account_circle</i>
+                        <h5 class="mt-2">{{ user.get_full_name|default:user.email }}</h5>
+                        <p class="text-muted">{{ user.email }}</p>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="{% url 'store:profile' %}" class="text-decoration-none d-flex align-items-center">
+                                <i class="material-icons me-2">person</i>
+                                Profil
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'store:orders' %}" class="text-decoration-none d-flex align-items-center">
+                                <i class="material-icons me-2">receipt</i>
+                                Porudžbine
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'store:wishlist' %}" class="text-decoration-none d-flex align-items-center">
+                                <i class="material-icons me-2">favorite</i>
+                                Lista želja
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Moje porudžbine</h4>
+                </div>
+                <div class="card-body">
+                    {% if orders %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Broj porudžbine</th>
+                                    <th>Datum</th>
+                                    <th>Ukupno</th>
+                                    <th>Status</th>
+                                    <th>Akcija</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td>#{{ order.id }}</td>
+                                    <td>{{ order.created_at|date:"d.m.Y. H:i" }}</td>
+                                    <td>${{ order.total_price }}</td>
+                                    <td>
+                                        <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'processing' %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'store:order_detail' order.id %}" class="btn btn-sm btn-outline-primary">
+                                            Detalji
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="material-icons display-1 text-muted">receipt</i>
+                        <h3 class="mt-3">Nema porudžbina</h3>
+                        <p class="text-muted">Još uvek niste napravili nijednu porudžbinu.</p>
+                        <a href="{% url 'store:store' %}" class="btn btn-primary">Nastavi sa kupovinom</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
